@@ -6,7 +6,7 @@ HOST="sumin@suminb.com"
 rm -rf $(find . -name "*.pyc")
 
 # Deploy files
-rsync -azP -e ssh * $HOST:webapps/hallucination/webapp
+rsync -azP -e ssh * $HOST:webapps/hallucination/repo
 
 read -p "Restart the server? " -n 1 -r
 echo

@@ -23,6 +23,8 @@ def __request__():
         logger=logger
     )
 
+    logger.info('proxy_factory={}'.format(proxy_factory))
+
     keys = filter(lambda x: x != 'url', request.form.keys())
     params = {key: request.form[key] for key in keys}
 
@@ -31,8 +33,9 @@ def __request__():
     #data = dict(q=request.form['q'])
 
     headers = {
-        #'Referer': 'http://translate.google.com/',
+        'Referer': 'http://translate.google.com/',
         #'User-Agent': "Mozilla/5.0 (X11; Linux x86_64; rv:5.0) Gecko/20100101 Firefox/5.0)",
+        'User-Agent': request.headers['User-Agent'],
         #'Content-Length': str(sys.getsizeof(text))
     }
 
@@ -40,12 +43,17 @@ def __request__():
         #req = requests.post(url, params=params, data=data, headers=request.headers, timeout=5)
         #req = requests.get(url, params=payload, headers=headers)
 
-        req = proxy_factory.make_request(url, headers=request.headers, params=params,
+        req = proxy_factory.make_request(url, headers=headers, params=params,
             req_type=requests.post, timeout=2, pool_size=10)
+
+        if req == None:
+            logger.error('Request failed (req=None)')
+            return 'Request failed', 500
 
         return req.text, req.status_code
 
     except Exception as e:
+        logger.exception(e)
         return str(e), 500
 
 
